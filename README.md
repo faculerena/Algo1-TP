@@ -3,7 +3,7 @@ TP Funcional algoritmos 1
 Abajo de todo esta la guia de como usar git
 
 # Relevante del tp
-
+Esta hecho hasta el ej 3 sin testear.
 
 # How to git(hub)
 
