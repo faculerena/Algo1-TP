@@ -87,10 +87,17 @@ estaRobertoCarlos rs = cantidadDeAmigos rs (usuarioConMasAmigos rs) >= 1000000
 
 
 
--- describir qué hace la función: .....
+-- describir qué hace la función: dada una red social y un usuario, devuelve todas las publicaciones de ese usuario
 publicacionesDe :: RedSocial -> Usuario -> [Publicacion]
-publicacionesDe = undefined
+publicacionesDe rs user = filtrarPublicaciones (publicaciones rs) user
 
+
+-- toma la lista de publicaciones y el usuario, y chequea si la primera es del usuario, si es, la agrega a la respuesta, sino, llama recursivamente a la 
+-- funcion con la cola de la lista de publicaciones
+filtrarPublicaciones :: [Publicacion] -> Usuario -> [Publicacion]
+filtrarPublicaciones [] _ = []
+filtrarPublicaciones (p:ps) user | idDeUsuario (usuarioDePublicacion p) == idDeUsuario user = p : filtrarPublicaciones ps user
+                                 | otherwise = filtrarPublicaciones ps user
 
 
 
