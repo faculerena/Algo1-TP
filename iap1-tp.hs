@@ -103,17 +103,21 @@ filtrarPublicaciones (p:ps) user | idDeUsuario (usuarioDePublicacion p) == idDeU
 
 -- describir qué hace la función: .....
 publicacionesQueLeGustanA :: RedSocial -> Usuario -> [Publicacion]
-publicacionesQueLeGustanA = undefined
+publicacionesQueLeGustanA rs user = filtrarPublicacionesQueLeGustanA (publicaciones rs) user
 
 
+filtrarPublicacionesQueLeGustanA :: [Publicacion] -> Usuario -> [Publicacion]
+filtrarPublicacionesQueLeGustanA [] _ = []
+filtrarPublicacionesQueLeGustanA (p:ps) user | leGustaA user p = p : filtrarPublicacionesQueLeGustanA ps user
+                                             | otherwise = filtrarPublicacionesQueLeGustanA ps user
+
+leGustaA :: Usuario -> Publicacion -> Bool
+leGustaA user p = elem user (likesDePublicacion p)
 
 
 -- describir qué hace la función: .....
 lesGustanLasMismasPublicaciones :: RedSocial -> Usuario -> Usuario -> Bool
-lesGustanLasMismasPublicaciones = undefined
-
-
-
+lesGustanLasMismasPublicaciones rs user1 user2 = (publicacionesQueLeGustanA rs user1) == (publicacionesQueLeGustanA rs user2) 
 
 
 -- describir qué hace la función: .....
@@ -208,3 +212,21 @@ relacionesC = [relacion12_1, relacion12_2, relacion12_3, relacion12_4, relacion1
 redC = (usuariosC, relacionesC, [])
 
 
+
+{-
+{
+    (res = true ⇔ (∃u2 : Usuario) 
+                (Pertenece(u2, usuarios(red)) 
+                ∧ 
+                u ̸= u2 
+                ∧
+                (∀pub : Publicacion)
+                    (Pertenece(pub, red) 
+                    ∧ 
+                    usuarioDeP ublicacion(pub) = u → Pertenece(u2, likesDePublicacion(pub))
+                    )
+                ) 
+            ∧ | publicacionesDe(red, u)| > 0
+            
+}
+-}
