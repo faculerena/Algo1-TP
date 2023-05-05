@@ -74,12 +74,13 @@ cantidadDeAmigos rs user = length (amigosDe rs user)
 
 
 
--- describir qué hace la función: .....
+-- describir qué hace la función: dada una red social, devuelve el usuario con más amigos
 usuarioConMasAmigos :: RedSocial -> Usuario
 usuarioConMasAmigos rs = encontrarUsuarioConMasAmigos rs (usuarios rs)
 
 
-
+-- esto lo hace comparando la cantidad de amigos de un usuario con el hipotetico usuario con mas amigos (llamada recursiva), funcion que 
+-- termina "colapsando" cuando se queda sin comparaciones y `x > todo el resto` 
 encontrarUsuarioConMasAmigos :: RedSocial -> [Usuario] -> Usuario
 encontrarUsuarioConMasAmigos rs (x:[]) = x 
 encontrarUsuarioConMasAmigos rs (x:xs) | length (amigosDe rs x) > length (amigosDe rs (encontrarUsuarioConMasAmigos rs xs)) = x
@@ -87,7 +88,7 @@ encontrarUsuarioConMasAmigos rs (x:xs) | length (amigosDe rs x) > length (amigos
 
 
 
--- describir qué hace la función: .....
+-- describir qué hace la función: busca al usuario con mas amigos, si este usuario tiene mas de un millon de amigos, cumplio el sueño de roberto carlos
 estaRobertoCarlos :: RedSocial -> Bool
 estaRobertoCarlos rs = cantidadDeAmigos rs (usuarioConMasAmigos rs) > 1000000 
 
