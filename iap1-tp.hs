@@ -46,9 +46,6 @@ proyectarNombres [] = []
 proyectarNombres (u:us) = nombreDeUsuario u : proyectarNombres us
 
 
-
-
-
 -- dada una red social y un usuario, devuelve los amigos del usuario
 amigosDe :: RedSocial -> Usuario -> [Usuario]
 amigosDe rs user = relacionesAAmigosDe (relaciones rs) user
@@ -62,15 +59,9 @@ relacionesAAmigosDe (r:rs) user | idDeUsuario (fst r) == idDeUsuario user = (snd
 
 
 
-
-
-
-
 -- dada una red social y un usuario, devuelve la cantidad de amigos del usuario
 cantidadDeAmigos :: RedSocial -> Usuario -> Int
 cantidadDeAmigos rs user = length (amigosDe rs user)
-
-
 
 
 
@@ -83,14 +74,14 @@ usuarioConMasAmigos rs = encontrarUsuarioConMasAmigos rs (usuarios rs)
 -- termina "colapsando" cuando se queda sin comparaciones y `x > todo el resto` 
 encontrarUsuarioConMasAmigos :: RedSocial -> [Usuario] -> Usuario
 encontrarUsuarioConMasAmigos rs (x:[]) = x 
-encontrarUsuarioConMasAmigos rs (x:xs) | length (amigosDe rs x) > length (amigosDe rs (encontrarUsuarioConMasAmigos rs xs)) = x
+encontrarUsuarioConMasAmigos rs (x:xs) | (cantidadDeAmigos rs x) > (cantidadDeAmigos rs (encontrarUsuarioConMasAmigos rs xs)) = x
                                        | otherwise = encontrarUsuarioConMasAmigos rs xs
 
 
 
 -- describir qué hace la función: busca al usuario con mas amigos, si este usuario tiene mas de un millon de amigos, cumplio el sueño de roberto carlos
 estaRobertoCarlos :: RedSocial -> Bool
-estaRobertoCarlos rs = cantidadDeAmigos rs (usuarioConMasAmigos rs) > 1000000 
+estaRobertoCarlos rs = cantidadDeAmigos rs (usuarioConMasAmigos rs) >= 1000000
 
 
 
