@@ -200,11 +200,20 @@ filtrarLikesDePublicacionesDe pubDe = likesDePublicacion (head (pubDe)) : filtra
 
 
 
-
-
 -- describir qué hace la función: .....
 existeSecuenciaDeAmigos :: RedSocial -> Usuario -> Usuario -> Bool
-existeSecuenciaDeAmigos = undefined
+existeSecuenciaDeAmigos rs user userTarget = existeSecuenciaAux1 rs user userTarget 
+
+existeSecuenciaAux1 :: RedSocial -> Usuario -> Usuario -> Bool
+existeSecuenciaAux1 rs user userTarget | elem userTarget (amigosDe rs user) = True
+                                       | otherwise = existeSecuenciaAux2 rs user userTarget (amigosDe rs user)
+
+
+
+existeSecuenciaAux2 :: RedSocial -> Usuario -> Usuario -> [Usuario] -> Bool
+existeSecuenciaAux2 rs user userTarget [] = False
+existeSecuenciaAux2 rs user userTarget (x:xs) | elem userTarget (amigosDe rs x) = True
+                                              | otherwise = existeSecuenciaAux2 rs user userTarget xs
 
 
 
@@ -212,124 +221,7 @@ existeSecuenciaDeAmigos = undefined
 
 
 
-test :: IO ()
-test = do 
-    testNombresDeUsuarios
-    testAmigosDe
-    testCantidadDeAmigos
-    testTieneUnSeguidorFiel 
 
-
-testTieneUnSeguidorFiel :: IO ()
-testTieneUnSeguidorFiel = do
-    putStrLn "> Test tieneUnSeguidorFiel"
-    if tieneUnSeguidorFiel redA usuario1 == True 
-        then putStrLn ("   OK")
-        else putStrLn ("   ERROR con redA usuario1")
-    if tieneUnSeguidorFiel redA usuario2  == True
-        then putStrLn ("   OK")
-        else putStrLn ("   ERROR con redA usuario2")
-    if tieneUnSeguidorFiel redA usuario3 == False
-        then putStrLn ("   OK")
-        else putStrLn ("   ERROR con redA usuario3")
-    if tieneUnSeguidorFiel redA usuario4 == False
-        then putStrLn ("   OK")
-        else putStrLn ("   ERROR con redA usuario4")
-    if tieneUnSeguidorFiel redB usuario1 == False
-        then putStrLn ("   OK")
-        else putStrLn ("   ERROR con redB usuario1")
-    if tieneUnSeguidorFiel redB usuario2 == False 
-        then putStrLn ("   OK")
-        else putStrLn ("   ERROR con redB usuario2")
-    if tieneUnSeguidorFiel redB usuario3 == False
-        then putStrLn ("   OK")
-        else putStrLn ("   ERROR con redC usuario1")
-    if tieneUnSeguidorFiel redB usuario5 == False 
-        then putStrLn ("   OK")
-        else putStrLn ("   ERROR con redC usuario2")
-
-testNombresDeUsuarios :: IO ()
-testNombresDeUsuarios = do 
-    putStrLn "> Test nombresDeUsuarios"    
-    if nombresDeUsuarios redA == ["Juan", "Natalia", "Pedro", "Mariela"]
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redA"
-    if nombresDeUsuarios redB == ["Juan", "Natalia", "Pedro", "Natalia"]
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redB"
-    if nombresDeUsuarios redC == ["Juan", "Natalia", "Pedro", "Mariela", "Natalia", "Santiago", "Laura", "Miguel", "Florencia", "José", "Camila", "Facundo", "Valentina", "Gabriel", "Marina"]
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redC"       
-    if nombresDeUsuarios ([], [], []) == []
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con []"
-
-testAmigosDe :: IO ()
-testAmigosDe = do 
-    putStrLn "> Test amigosDe"
-    if amigosDe redA usuario1 == [usuario2, usuario4]
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redA usuario1"
-    if amigosDe redA usuario2 == [usuario1, usuario3, usuario4]
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redA usuario2"
-    if amigosDe redA usuario3 == [usuario2, usuario4]
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redA usuario3"
-    if amigosDe redA usuario4 == [usuario1, usuario2, usuario3]
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redA usuario4"
-    if amigosDe redB usuario1 == [usuario2]
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redB usuario1"
-    if amigosDe redB usuario2 == [usuario1, usuario3]
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redB usuario2"
-    if amigosDe redB usuario3 == [usuario2]
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redB usuario3"
-    if amigosDe redB usuario5 == []
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redB usuario5"
-        
-
-testCantidadDeAmigos :: IO ()
-testCantidadDeAmigos = do 
-    putStrLn "> Test cantidadDeAmigos"
-    if cantidadDeAmigos redA usuario1 == 2
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redA usuario1"
-    if cantidadDeAmigos redA usuario2 == 3
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redA usuario2"
-    if cantidadDeAmigos redA usuario3 == 2
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redA usuario3"
-    if cantidadDeAmigos redA usuario4 == 3
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redA usuario4"
-    if cantidadDeAmigos redB usuario5 == 0
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redB usuario1"
-    if cantidadDeAmigos redB usuario1 == 1
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redB usuario2"
-    if cantidadDeAmigos redB usuario2 == 2
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redB usuario3"
-    if cantidadDeAmigos redB usuario3 == 1
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redB usuario4"
-    if cantidadDeAmigos redB usuario4 == 0 
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redb usuario4"
-    if cantidadDeAmigos redB usuario5 == 0
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redB usuario5"
-    if cantidadDeAmigos redC usuario1 == 4
-        then putStrLn "   OK"
-        else putStrLn "   ERROR con redC usuario1"
-    
 usuario1 = (1, "Juan")
 usuario2 = (2, "Natalia")
 usuario3 = (3, "Pedro")
@@ -345,10 +237,6 @@ usuario12 = (12, "Facundo")
 usuario13 = (13, "Valentina")
 usuario14 = (14, "Gabriel")
 usuario15 = (15, "Marina")
-
-
-
-
 
 
 relacion1_2 = (usuario1, usuario2)

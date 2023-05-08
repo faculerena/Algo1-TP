@@ -1,6 +1,7 @@
 import Test.HUnit
 main = runTestTT testsPersonales
 
+
 tests = test [
     " nombresDeUsuarios 1" ~: (nombresDeUsuarios redA) ~?= ["Juan","Natalia","Pedro","Mariela"],
 
@@ -27,21 +28,34 @@ expectAny actual expected = elem actual expected ~? ("expected any of: " ++ show
 
 
 testsPersonales = test [
+--relacionesD = [relacion1_2, relacion2_3, relacion3_4, relacion4_5, relacion6_7]
+
+    " existeSecuenciaDeAmigos 1" ~: (existeSecuenciaDeAmigos redD usuario1 usuario2) ~?= True,
+
+    " existeSecuenciaDeAmigos 1" ~: (existeSecuenciaDeAmigos redD usuario1 usuario5) ~?= True,
+
+   -- " existeSecuenciaDeAmigos 1" ~: (existeSecuenciaDeAmigos redD usuario6 usuario1) ~?= False,
+
+    " existeSecuenciaDeAmigos 1" ~: (existeSecuenciaDeAmigos redD usuario1 usuario6) ~?= False,
+
+    " existeSecuenciaDeAmigos 1" ~: (existeSecuenciaDeAmigos redD usuario7 usuario6) ~?= True,
+
+
     " nombresDeUsuarios 1" ~: (nombresDeUsuarios redB) ~?=  ["Juan", "Natalia", "Pedro", "Natalia"],
 
     " nombresDeUsuarios 2"  ~: (nombresDeUsuarios redC) ~?= ["Juan", "Natalia", "Pedro", "Mariela", "Natalia", "Santiago", "Laura", "Miguel", "Florencia", "José", "Camila", "Facundo", "Valentina", "Gabriel", "Marina"],
 
-    " nombresDeUsuarios 3" ~: (nombresDeUsuarios ([],[],[])) ~?= [],
+    " nombresDeUsuarios 3" ~: (nombresDeUsuarios ([],[],[])) ~?= [], --red vacia
 
     " amigosDe 1" ~: (amigosDe redB usuario1) ~?= [usuario2],
 
     " amigosDe 2" ~: (amigosDe redB usuario2) ~?= [usuario1, usuario3],
 
-    " amigosDe 3" ~: (amigosDe redB usuario5) ~?= [],
+    " amigosDe 3" ~: (amigosDe redB usuario5) ~?= [], --usuario que no tiene ammigos
 
-    " cantidadDeAmigos 1" ~: (cantidadDeAmigos redB usuario5) ~?= 0,
+    " cantidadDeAmigos 1" ~: (cantidadDeAmigos redB usuario5) ~?= 0, 
 
-    " cantidadDeAmigos 2" ~: (cantidadDeAmigos redB usuario4) ~?= 0,
+    " cantidadDeAmigos 2" ~: (cantidadDeAmigos redB usuario4) ~?= 0, --testea a alguien que no esta en la red
 
     " cantidadDeAmigos 3" ~: (cantidadDeAmigos redC usuario1) ~?= 4,
 
@@ -84,6 +98,7 @@ relacion3_4 = (usuario4, usuario3)
 relacion2_5 = (usuario5, usuario2)
 relacion3_5 = (usuario5, usuario3)
 relacion4_5 = (usuario5, usuario4)
+relacion5_6 = (usuario5, usuario6)
 relacion6_7 = (usuario6, usuario7)
 relacion8_9 = (usuario8, usuario9)
 relacion10_11 = (usuario10, usuario11)
@@ -143,6 +158,9 @@ relacionesC = [relacion12_1, relacion12_2, relacion12_3, relacion12_4, relacion1
 publicacionesC = [publicacion1_1, publicacion1_2, publicacion1_3, publicacion2_3, publicacion2_4, publicacion3_4, publicacion3_5, publicacion3_6, publicacion4_4, publicacion4_5, publicacion4_6, publicacion5_1, publicacion5_2, publicacion5_3]
 redC = (usuariosC, relacionesC, [])
 
+usuariosD = [usuario1, usuario2, usuario3, usuario4, usuario5, usuario6, usuario7]
+relacionesD = [relacion1_2, relacion2_3, relacion3_4, relacion4_5, relacion6_7]
+redD = (usuariosD, relacionesD, [])
 
 
 
@@ -267,8 +285,27 @@ filtrarLikesDePublicacionesDe pubDe = likesDePublicacion (head (pubDe)) : filtra
 
 
 -- ej 10
+-- describir qué hace la función: DFS lol no se me ocurrio nada mejor y es RECONTRA overkill    
+
 existeSecuenciaDeAmigos :: RedSocial -> Usuario -> Usuario -> Bool
-existeSecuenciaDeAmigos = undefined
+existeSecuenciaDeAmigos (_, rs, _) user1 user2 = secAmigosAux rs user1 user2 []
 
+secAmigosAux :: [Relacion] -> Usuario -> Usuario -> [Usuario] -> Bool
+secAmigosAux rs user1 user2 vistos | user1 == user2 = True
+                                   | otherwise = secAmigosAux2 rs user1 user2 vistos amigos
+                                     where amigos = amigosDeUsuario rs user1
 
+secAmigosAux2 :: [Relacion] -> Usuario -> Usuario -> [Usuario] -> [Usuario] -> Bool
+secAmigosAux2 _ _ _ _ [] = False
+secAmigosAux2 rs user1 user2 vistos (amigo:resto) | elem amigo vistos = secAmigosAux2 rs user1 user2 vistos resto
+                                                  | amigo == user2 = True
+                                                  | otherwise = secAmigosAux2 rs amigo user2 (user1:vistos) (amigosDeUsuario rs amigo ++ resto)
 
+amigosDeUsuario :: [Relacion] -> Usuario -> [Usuario]
+amigosDeUsuario rs usuario = amigosDeUsuarioAux rs usuario []
+
+amigosDeUsuarioAux :: [Relacion] -> Usuario -> [Usuario] -> [Usuario]
+amigosDeUsuarioAux [] _ amigos = amigos
+amigosDeUsuarioAux ((user1, user2):rs) usuario amigos | user1 == usuario && not (elem user2 amigos) = amigosDeUsuarioAux rs usuario (user2:amigos)
+                                                      | user2 == usuario && not (elem user1 amigos) = amigosDeUsuarioAux rs usuario (user1:amigos)
+                                                      | otherwise = amigosDeUsuarioAux rs usuario amigos
