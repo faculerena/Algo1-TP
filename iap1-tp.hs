@@ -1,5 +1,4 @@
-module Main where
-main = undefined
+module Solution where
 -- Completar con los datos del grupo
 --
 -- Nombre de Grupo: xx
@@ -202,110 +201,27 @@ filtrarLikesDePublicacionesDe pubDe = likesDePublicacion (head (pubDe)) : filtra
 
 -- describir qué hace la función: .....
 existeSecuenciaDeAmigos :: RedSocial -> Usuario -> Usuario -> Bool
-existeSecuenciaDeAmigos rs user userTarget = existeSecuenciaAux1 rs user userTarget 
+existeSecuenciaDeAmigos (_, rs, _) user1 user2 = secAmigosAux rs user1 user2 []
 
-existeSecuenciaAux1 :: RedSocial -> Usuario -> Usuario -> Bool
-existeSecuenciaAux1 rs user userTarget | elem userTarget (amigosDe rs user) = True
-                                       | otherwise = existeSecuenciaAux2 rs user userTarget (amigosDe rs user)
+secAmigosAux :: [Relacion] -> Usuario -> Usuario -> [Usuario] -> Bool
+secAmigosAux rs user1 user2 vistos | user1 == user2 = True
+                                   | otherwise = secAmigosAux2 rs user1 user2 vistos amigos
+                                     where amigos = amigosDeUsuario rs user1
 
+secAmigosAux2 :: [Relacion] -> Usuario -> Usuario -> [Usuario] -> [Usuario] -> Bool
+secAmigosAux2 _ _ _ _ [] = False
+secAmigosAux2 rs user1 user2 vistos (amigo:resto) | elem amigo vistos = secAmigosAux2 rs user1 user2 vistos resto
+                                                  | amigo == user2 = True
+                                                  | otherwise = secAmigosAux2 rs amigo user2 (user1:vistos) (amigosDeUsuario rs amigo ++ resto)
 
+amigosDeUsuario :: [Relacion] -> Usuario -> [Usuario]
+amigosDeUsuario rs usuario = amigosDeUsuarioAux rs usuario []
 
-existeSecuenciaAux2 :: RedSocial -> Usuario -> Usuario -> [Usuario] -> Bool
-existeSecuenciaAux2 rs user userTarget [] = False
-existeSecuenciaAux2 rs user userTarget (x:xs) | elem userTarget (amigosDe rs x) = True
-                                              | otherwise = existeSecuenciaAux2 rs user userTarget xs
-
-
-
-
-
-
-
-
-usuario1 = (1, "Juan")
-usuario2 = (2, "Natalia")
-usuario3 = (3, "Pedro")
-usuario4 = (4, "Mariela")
-usuario5 = (5, "Natalia")
-usuario6 = (6, "Santiago")
-usuario7 = (7, "Laura")
-usuario8 = (8, "Miguel")
-usuario9 = (9, "Florencia")
-usuario10 = (10, "José")
-usuario11 = (11, "Camila")
-usuario12 = (12, "Facundo")
-usuario13 = (13, "Valentina")
-usuario14 = (14, "Gabriel")
-usuario15 = (15, "Marina")
-
-
-relacion1_2 = (usuario1, usuario2)
-relacion1_3 = (usuario1, usuario3)
-relacion1_4 = (usuario4, usuario1) -- Notar que el orden en el que aparecen los usuarios es indistinto
-relacion2_3 = (usuario3, usuario2)
-relacion2_4 = (usuario2, usuario4)
-relacion3_4 = (usuario4, usuario3)
-relacion2_5 = (usuario5, usuario2)
-relacion3_5 = (usuario5, usuario3)
-relacion4_5 = (usuario5, usuario4)
-relacion6_7 = (usuario6, usuario7)
-relacion8_9 = (usuario8, usuario9)
-relacion10_11 = (usuario10, usuario11)
-relacion12_13 = (usuario12, usuario13)
-relacion14_15 = (usuario14, usuario15)
-relacion12_1 = (usuario12, usuario1)
-relacion12_2 = (usuario12, usuario2)
-relacion12_3 = (usuario12, usuario3)
-relacion12_4 = (usuario12, usuario4)
-relacion12_5 = (usuario12, usuario5)
-
-
-publicacion1_1 = (usuario1, "Este es mi primer post", [usuario2, usuario4])
-publicacion1_2 = (usuario1, "Este es mi segundo post", [usuario4])
-publicacion1_3 = (usuario1, "Este es mi tercer post", [usuario2, usuario5])
-publicacion1_4 = (usuario1, "Este es mi cuarto post", [])
-publicacion1_5 = (usuario1, "Este es como mi quinto post", [usuario5])
-
-publicacion2_1 = (usuario2, "Hello World", [usuario4])
-publicacion2_2 = (usuario2, "Good Bye World", [usuario1, usuario4])
-
-publicacion3_1 = (usuario3, "Lorem Ipsum", [])
-publicacion3_2 = (usuario3, "dolor sit amet", [usuario2])
-publicacion3_3 = (usuario3, "consectetur adipiscing elit", [usuario2, usuario5])
-
-publicacion4_1 = (usuario4, "I am Alice. Not", [usuario1, usuario2])
-publicacion4_2 = (usuario4, "I am Bob", [])
-publicacion4_3 = (usuario4, "Just kidding, i am Mariela", [usuario1, usuario3])
-
-publicacion2_3 = (usuario2, "I love Haskell", [usuario3, usuario5])
-publicacion2_4 = (usuario2, "Lorem ipsum dolor sit amet,", [usuario1, usuario4, usuario5])
-
-publicacion3_4 = (usuario3, "consectetur adipiscing", [usuario1])
-publicacion3_5 = (usuario3, "Proin lacinia erat", [usuario2, usuario4])
-publicacion3_6 = (usuario3, "viverra sit amet.", [usuario5])
-
-publicacion4_4 = (usuario4, "Cras ac dolor sapien", [usuario2, usuario3])
-publicacion4_5 = (usuario4, "Sed in tristique dolor?", [usuario1, usuario5])
-publicacion4_6 = (usuario4, "egestas pharetra odio. Integer", [usuario2])
-
-publicacion5_1 = (usuario5, "bibendum neque tortor quis magna!", [usuario1, usuario2, usuario3, usuario4])
-publicacion5_2 = (usuario5, "Pellentesque quis massa", [usuario3])
-publicacion5_3 = (usuario5, "sed elit ultrices blandit", [usuario1, usuario2, usuario4])
-
-usuariosA = [usuario1, usuario2, usuario3, usuario4]
-relacionesA = [relacion1_2, relacion1_4, relacion2_3, relacion2_4, relacion3_4]
-publicacionesA = [publicacion1_1, publicacion1_2, publicacion2_1, publicacion2_2, publicacion3_1, publicacion3_2, publicacion4_1, publicacion4_2]
-redA = (usuariosA, relacionesA, publicacionesA)
-
-usuariosB = [usuario1, usuario2, usuario3, usuario5]
-relacionesB = [relacion1_2, relacion2_3]
-publicacionesB = [publicacion1_3, publicacion1_4, publicacion1_5, publicacion3_1, publicacion3_2, publicacion3_3]
-redB = (usuariosB, relacionesB, publicacionesB)
-
-usuariosC = [usuario1, usuario2, usuario3, usuario4, usuario5, usuario6, usuario7, usuario8, usuario9, usuario10, usuario11, usuario12, usuario13, usuario14, usuario15]
-relacionesC = [relacion12_1, relacion12_2, relacion12_3, relacion12_4, relacion12_5, relacion1_2, relacion1_3, relacion1_4, relacion2_3, relacion2_4, relacion2_5, relacion3_4, relacion3_5, relacion4_5, relacion6_7, relacion8_9, relacion10_11, relacion12_13, relacion14_15]
-publicacionesC = [publicacion1_1, publicacion1_2, publicacion1_3, publicacion2_3, publicacion2_4, publicacion3_4, publicacion3_5, publicacion3_6, publicacion4_4, publicacion4_5, publicacion4_6, publicacion5_1, publicacion5_2, publicacion5_3]
-redC = (usuariosC, relacionesC, [])
+amigosDeUsuarioAux :: [Relacion] -> Usuario -> [Usuario] -> [Usuario]
+amigosDeUsuarioAux [] _ amigos = amigos
+amigosDeUsuarioAux ((user1, user2):rs) usuario amigos | user1 == usuario && not (elem user2 amigos) = amigosDeUsuarioAux rs usuario (user2:amigos)
+                                                      | user2 == usuario && not (elem user1 amigos) = amigosDeUsuarioAux rs usuario (user1:amigos)
+                                                      | otherwise = amigosDeUsuarioAux rs usuario amigos
 
 
 

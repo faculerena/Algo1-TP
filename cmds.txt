@@ -1,0 +1,3 @@
+ghci
+import Test.HUnit
+:l test-catedra.hs  iap1-tp.hs 
