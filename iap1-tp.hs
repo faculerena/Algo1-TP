@@ -13,6 +13,10 @@ type Relacion = (Usuario, Usuario) -- usuarios que se relacionan
 type Publicacion = (Usuario, String, [Usuario]) -- (usuario que publica, texto publicacion, likes)
 type RedSocial = ([Usuario], [Relacion], [Publicacion])
 
+
+--prueba de git
+
+
 -- Funciones basicas
 
 usuarios :: RedSocial -> [Usuario]
