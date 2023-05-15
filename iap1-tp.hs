@@ -62,8 +62,8 @@ amigosDe rs user = relacionesAAmigosDe (relaciones rs) user
 -- toma una lista de relaciones y un usuario y devuelve una lista de usuarios que son amigos del usuario
 relacionesAAmigosDe :: [Relacion] -> Usuario -> [Usuario]
 relacionesAAmigosDe [] _ = []
-relacionesAAmigosDe (r:rs) user | idDeUsuario (fst r) == idDeUsuario user = (snd r) : relacionesAAmigosDe rs user
-                              | idDeUsuario (snd r) == idDeUsuario user = (fst r) : relacionesAAmigosDe rs user
+relacionesAAmigosDe (r:rs) user | (fst r) == user = (snd r) : relacionesAAmigosDe rs user
+                              | (snd r) == user = (fst r) : relacionesAAmigosDe rs user
                               | otherwise = relacionesAAmigosDe rs user
 
 
@@ -81,6 +81,7 @@ cantidadDeAmigos rs user = length (amigosDe rs user)
 
 -- describir qué hace la función: dada una red social, devuelve el usuario con más amigos
 usuarioConMasAmigos :: RedSocial -> Usuario
+usuarioConMasAmigos ([],_,_) = undefined
 usuarioConMasAmigos rs = encontrarUsuarioConMasAmigos rs (usuarios rs)
 
 
@@ -102,7 +103,7 @@ encontrarUsuarioConMasAmigos rs (x:xs) | (cantidadDeAmigos rs x) > (cantidadDeAm
 
 -- describir qué hace la función: busca al usuario con mas amigos, si este usuario tiene mas de un millon de amigos, cumplio el sueño de roberto carlos
 estaRobertoCarlos :: RedSocial -> Bool
-estaRobertoCarlos rs = cantidadDeAmigos rs (usuarioConMasAmigos rs) >= 1000000
+estaRobertoCarlos rs = cantidadDeAmigos rs (usuarioConMasAmigos rs) >= 10
 
 
 
@@ -121,7 +122,7 @@ publicacionesDe rs user = filtrarPublicaciones (publicaciones rs) user
 -- funcion con la cola de la lista de publicaciones
 filtrarPublicaciones :: [Publicacion] -> Usuario -> [Publicacion]
 filtrarPublicaciones [] _ = []
-filtrarPublicaciones (p:ps) user | idDeUsuario (usuarioDePublicacion p) == idDeUsuario user = p : filtrarPublicaciones ps user
+filtrarPublicaciones (p:ps) user | usuarioDePublicacion p == user = p : filtrarPublicaciones ps user
                                  | otherwise = filtrarPublicaciones ps user
 
 
@@ -201,27 +202,19 @@ filtrarLikesDePublicacionesDe pubDe = likesDePublicacion (head (pubDe)) : filtra
 
 -- describir qué hace la función: .....
 existeSecuenciaDeAmigos :: RedSocial -> Usuario -> Usuario -> Bool
-existeSecuenciaDeAmigos (_, rs, _) user1 user2 = secAmigosAux rs user1 user2 []
+existeSecuenciaDeAmigos (_, rel, _) user1 user2 = secAmigosAux rel user1 user2 []
 
 secAmigosAux :: [Relacion] -> Usuario -> Usuario -> [Usuario] -> Bool
-secAmigosAux rs user1 user2 vistos | user1 == user2 = True
-                                   | otherwise = secAmigosAux2 rs user1 user2 vistos amigos
-                                     where amigos = amigosDeUsuario rs user1
+secAmigosAux rel user1 user2 vistos | user1 == user2 = True
+                                   | otherwise = secAmigosAux2 rel user1 user2 vistos amigos
+                                     where amigos = amigosDeUsuario rel user1
 
 secAmigosAux2 :: [Relacion] -> Usuario -> Usuario -> [Usuario] -> [Usuario] -> Bool
 secAmigosAux2 _ _ _ _ [] = False
-secAmigosAux2 rs user1 user2 vistos (amigo:resto) | elem amigo vistos = secAmigosAux2 rs user1 user2 vistos resto
+secAmigosAux2 rel user1 user2 vistos (amigo:resto) | elem amigo vistos = secAmigosAux2 rel user1 user2 vistos resto
                                                   | amigo == user2 = True
-                                                  | otherwise = secAmigosAux2 rs amigo user2 (user1:vistos) (amigosDeUsuario rs amigo ++ resto)
+                                                  | otherwise = secAmigosAux2 rel amigo user2 (user1:vistos) (amigosDeUsuario rel amigo ++ resto)
 
 amigosDeUsuario :: [Relacion] -> Usuario -> [Usuario]
-amigosDeUsuario rs usuario = amigosDeUsuarioAux rs usuario []
-
-amigosDeUsuarioAux :: [Relacion] -> Usuario -> [Usuario] -> [Usuario]
-amigosDeUsuarioAux [] _ amigos = amigos
-amigosDeUsuarioAux ((user1, user2):rs) usuario amigos | user1 == usuario && not (elem user2 amigos) = amigosDeUsuarioAux rs usuario (user2:amigos)
-                                                      | user2 == usuario && not (elem user1 amigos) = amigosDeUsuarioAux rs usuario (user1:amigos)
-                                                      | otherwise = amigosDeUsuarioAux rs usuario amigos
-
-
+amigosDeUsuario rel usuario = relacionesAAmigosDe rel usuario
 
