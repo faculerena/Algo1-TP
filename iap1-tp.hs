@@ -13,10 +13,6 @@ type Relacion = (Usuario, Usuario) -- usuarios que se relacionan
 type Publicacion = (Usuario, String, [Usuario]) -- (usuario que publica, texto publicacion, likes)
 type RedSocial = ([Usuario], [Relacion], [Publicacion])
 
-
---prueba de git
-
-
 -- Funciones basicas
 
 usuarios :: RedSocial -> [Usuario]
@@ -156,24 +152,22 @@ leGustaA user p = elem user (likesDePublicacion p)
 -- describir qué hace la función: .....
 lesGustanLasMismasPublicaciones :: RedSocial -> Usuario -> Usuario -> Bool
 lesGustanLasMismasPublicaciones rs user1 user2 = (publicacionesQueLeGustanA rs user1) == (publicacionesQueLeGustanA rs user2) 
--- describir qué hace la función:
--- recibe una redsocialvalida red y un usuario valido u tal que u pertenece a la red social
--- devuelve true si existe un usuario u2 que pertenezca a la red social 
--- (distinto de u) tal que 
--- para toda publicacion pub que pertenece a la red, 
--- si el usuario que hizo la publicacion pub es u 
--- entonces el usuario u2 le dio like
 
 
--- agregue "tieneUnSeguidorFielAux2 primerLista [] = false" porque si el usuario no tiene publicaciones, listaDeLikesDePub rs user devuelve vacio, que en tieneunseguidorfielaux devuelve true, 
--- y si llegaba a aux2 cuando la llamaba con head de listaDeLikesDePub tira head de empty list.
 
+
+-- Recibe una red social rs, un usuario user, y se fija si existe algun usuario user2 que haya dado like a todas las publicaciones de user,
+-- caso en el que devuelve true. De lo contrario devuelve false.
 tieneUnSeguidorFiel :: RedSocial -> Usuario -> Bool
 tieneUnSeguidorFiel rs user = tieneUnSeguidorFielAux2 (head (listaDeLikesDePub rs user)) (listaDeLikesDePub rs user)
 
---Recursion sobre los usuarios que dieron like (posibles seguidores fieles) si el primer usuario que dio like a la primera publicacion no dio like a las demas, se fija si lo hizo el resto.
+-- agregué "tieneUnSeguidorFielAux2 primerLista [] = false" porque si el usuario no tiene publicaciones, listaDeLikesDePub rs user devuelve vacio,
+-- y estaría aplicando la función head sobre una lista vacía.
+
+--Recursion sobre la primer lista de listaDeLikesDePub (posibles seguidores fieles). 
+--si el primer usuario que dio like a la primera publicacion no dio like a las demas, se fija si lo hizo el resto.
 tieneUnSeguidorFielAux2 :: [Usuario] -> [[Usuario]] -> Bool
-tieneUnSeguidorFielAux2 primerLista [] = False
+tieneUnSeguidorFielAux2 _ [] = False
 tieneUnSeguidorFielAux2 primerLista listaDeLikesDePub | primerLista == [] = False
                                            | tieneUnSeguidorFielAux1 primerLista listaDeLikesDePub == False = tieneUnSeguidorFielAux2 (tail (primerLista)) listaDeLikesDePub 
                                            | otherwise = True
@@ -185,13 +179,8 @@ tieneUnSeguidorFielAux1 primerLista listaDeLikesDePub | elem (head primerLista) 
                                            | otherwise = False
 
 
-
---listaDeLikesDePub = [[],[usuario1,usuario2]] : con este listaDeLikesDePub da false, como deberia dar, pero no se porque
-
--- si el user no tiene publicaciones , listaDeLikesDePub rs user pasa la lista vacia
-
---devuelve una lista con las listas de los usuarios que le dieron like a cada publicacion de un usuario : [[(1,osvaldo),(2,lucas)],[(1,osvaldo),(3,martin)],[(4,vinicius),(1,osvaldo)]]
---                                                                                         [[(1,osvaldo),(2,lucas)],[(1,osvaldo),(3,martin)],[(4,vinicius),(1,osvaldo)]]
+--devuelve una lista con las listas de los usuarios que le dieron like a cada publicacion de un usuario
+--si el user no tiene publicaciones , listaDeLikesDePub rs user pasa la lista vacia
 listaDeLikesDePub :: RedSocial -> Usuario -> [[Usuario]]
 listaDeLikesDePub rs user = filtrarLikesDePublicacionesDe (publicacionesDe rs user)
 
@@ -199,7 +188,6 @@ filtrarLikesDePublicacionesDe :: [Publicacion] -> [[Usuario]]
 filtrarLikesDePublicacionesDe [] = []
 filtrarLikesDePublicacionesDe pubDe = likesDePublicacion (head (pubDe)) : filtrarLikesDePublicacionesDe (tail pubDe)
 
---listaDeLikesDePub redA usuario4 = [[(usuario1,usuario2)],[]]
 
 
 
