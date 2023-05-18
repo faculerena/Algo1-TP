@@ -1,11 +1,13 @@
 import Test.HUnit
 import Solution
-main = runTestTT tests
 
-testear = runTestTT testsPersonales
+testCatedra = runTestTT tests
 
-testall = do runTestTT tests
-             runTestTT testsPersonales
+testGrupo = runTestTT testsPersonales
+
+main = do runTestTT tests
+          runTestTT testsPersonales
+
 
 tests = test [
     " nombresDeUsuarios 1" ~: (nombresDeUsuarios redA) ~?= ["Juan","Natalia","Pedro","Mariela"],
@@ -36,76 +38,47 @@ testsPersonales = test [
 
     " (nombresDeUsuarios) - red no vacia" ~: (nombresDeUsuarios redB) ~?=  ["Juan", "Natalia", "Pedro", "Natalia"],
 
-    " (nombresDeUsuarios) - red vacia no se cuelga" ~: (nombresDeUsuarios ([],[],[])) ~?= [], --red vacia
+    " (amigosDe) - tiene un solo amigo" ~: (amigosDe redB usuario1) ~?= [usuario2], 
 
+    " (amigosDe) - tiene mas de un amigo" ~: (amigosDe redB usuario2) ~?= [usuario1, usuario3], 
 
-
-    " (amigosDe) - tiene un solo amigo" ~: (amigosDe redB usuario1) ~?= [usuario2], -- 1 solo amigo
-
-    " (amigosDe) - tiene mas de un amigo" ~: (amigosDe redB usuario2) ~?= [usuario1, usuario3], -- mas de un amigo
-
-    " (amigosDe) - no tiene amigos en la red" ~: (amigosDe redB usuario5) ~?= [], -- no tiene ammigos
+    " (amigosDe) - no tiene amigos en la red" ~: (amigosDe redB usuario5) ~?= [], 
     
-    " (amigosDe) - el usuario no esta en la red" ~: (amigosDe redB usuario4) ~?= [], -- no esta en la red
+    " (cantidadDeAmigos) - no tiene amigos" ~: (cantidadDeAmigos redB usuario5) ~?= 0, 
 
-
-
-
-    " (cantidadDeAmigos) - no tiene amigos" ~: (cantidadDeAmigos redB usuario5) ~?= 0, -- no tiene amigos 
-
-    " (cantidadDeAmigos) - no esta en la red" ~: (cantidadDeAmigos redB usuario4) ~?= 0, -- no esta en la red
-
-    " (cantidadDeAmigos) - esta en la red y tiene amigos" ~: (cantidadDeAmigos redC usuario1) ~?= 4, -- normal
-
-
+    " (cantidadDeAmigos) - tiene amigos" ~: (cantidadDeAmigos redC usuario1) ~?= 4, 
 
     " (usuarioConMasAmigos) - un usuario con maximo" ~: (usuarioConMasAmigos redA ) ~?= usuario4,  
 
-    " (usuarioConMasAmigos) - dos usuarios con maximo" ~: expectAny (usuarioConMasAmigos redA) [usuario4, usuario2],  --ignorar este test si no se puede usar
-
-
+    " (usuarioConMasAmigos) - dos usuarios con maximo" ~: expectAny (usuarioConMasAmigos redA) [usuario4, usuario2],  
 
     " (estaRobertoCarlos) - no hay usuario con mas de 'un millon' de amigos" ~: (estaRobertoCarlos redB) ~?= False,
 
-    " (estaRobertoCarlos) - hay usuario con mas de 'un millon' de amigos" ~: (estaRobertoCarlos redC) ~?= True, -- esta en la red pero no es Roberto Carlos
-
-
+    " (estaRobertoCarlos) - hay usuario con mas de 'un millon' de amigos" ~: (estaRobertoCarlos redC) ~?= True, 
     
     " (publicacionesDe) - usuario con publicaciones" ~: (publicacionesDe redA usuario1) ~?= [((1,"Juan"),"Este es mi primer post",[(2,"Natalia"),(4,"Mariela")]),((1,"Juan"),"Este es mi segundo post",[(4,"Mariela")])], 
 
-    " (publicacionesDe) - usuario con publicaciones" ~: (publicacionesDe redA usuario5) ~?= [],
+    " (publicacionesDe) - usuario sin publicaciones" ~: (publicacionesDe redA usuario5) ~?= [],
 
+    " (publicacionesQueLeGustanA) - usuario dio likes" ~: (publicacionesQueLeGustanA redB usuario5) ~?= [((1,"Juan"),"Este es mi tercer post",[(2,"Natalia"),(5,"Natalia")]),((1,"Juan"),"Este es como mi quinto post",[(5,"Natalia")]),((3,"Pedro"),"consectetur adipiscing elit",[(2,"Natalia"),(5,"Natalia")])],
 
-
-    " (publicacionesQueLeGustanA) - usuario que dio like esta en la red" ~: (publicacionesQueLeGustanA redB usuario5) ~?= [((1,"Juan"),"Este es mi tercer post",[(2,"Natalia"),(5,"Natalia")]),((1,"Juan"),"Este es como mi quinto post",[(5,"Natalia")]),((3,"Pedro"),"consectetur adipiscing elit",[(2,"Natalia"),(5,"Natalia")])],
-
-    " (publicacionesQueLeGustanA) - usuario que dio like no esta en la red" ~: (publicacionesQueLeGustanA redB usuario4) ~?= [],
-
-    " (publicacionesQueLeGustanA) - usuario que dio like esta en la red pero no dio likes" ~: (publicacionesQueLeGustanA redC usuario15) ~?= [],
-
-
+    " (publicacionesQueLeGustanA) - usuario esta en la red pero no dio likes" ~: (publicacionesQueLeGustanA redC usuario15) ~?= [],
 
     " (lesGustanLasMismasPublicaciones) - ambos usuarios en la red les gustan las mismas" ~: (lesGustanLasMismasPublicaciones redB usuario1 usuario3) ~?= True,
 
     " (lesGustanLasMismasPublicaciones) - ambos usuarios en la red no les gustan las mismas" ~: (lesGustanLasMismasPublicaciones redB usuario1 usuario2) ~?= False,
 
-
-    
-
-
-    " (tieneUnSeguidorFiel) - si no es un seguidor fiel pero esta en la red" ~: (tieneUnSeguidorFiel redB usuario5) ~?= False,
-
-    " (tieneUnSeguidorFiel) - si no es un seguidor fiel y no esta en la red" ~: (tieneUnSeguidorFiel redB usuario4) ~?= False,
+    " (tieneUnSeguidorFiel) - si no es un seguidor fiel" ~: (tieneUnSeguidorFiel redB usuario5) ~?= False,
 
     " (tieneUnSeguidorFiel) - si es un seguidor fiel" ~: (tieneUnSeguidorFiel redA usuario2) ~?= True,
-  
 
+    " (tieneUnSeguidorFiel) - es su propio seguidor fiel" ~: (tieneUnSeguidorFiel redE usuario5) ~?= False,
 
-    " (existeSecuenciaDeAmigos) - no son amigos " ~: (existeSecuenciaDeAmigos redD usuario1 usuario6) ~?= False,  -- no son amigos
+    " (existeSecuenciaDeAmigos) - no son amigos " ~: (existeSecuenciaDeAmigos redD usuario1 usuario6) ~?= False,  
 
-    " (existeSecuenciaDeAmigos) - son amigos directos" ~: (existeSecuenciaDeAmigos redD usuario7 usuario6) ~?= True, -- son amigos directos
-     
-    " (existeSecuenciaDeAmigos) - son amigos indirectos" ~: (existeSecuenciaDeAmigos redD usuario1 usuario5) ~?= True -- son amigos indirectos
+    " (existeSecuenciaDeAmigos) - son amigos directos" ~: (existeSecuenciaDeAmigos redD usuario7 usuario6) ~?= True,
+
+    " (existeSecuenciaDeAmigos) - existe una secuencia >= 1" ~: (existeSecuenciaDeAmigos redD usuario1 usuario5) ~?= True 
 
  ]
 
@@ -137,6 +110,7 @@ usuario15 = (15, "Marina")
 relacion1_2 = (usuario1, usuario2)
 relacion1_3 = (usuario1, usuario3)
 relacion1_4 = (usuario4, usuario1) -- Notar que el orden en el que aparecen los usuarios es indistinto
+relacion1_5 = (usuario5, usuario1)
 relacion2_3 = (usuario3, usuario2)
 relacion2_4 = (usuario2, usuario4)
 relacion3_4 = (usuario4, usuario3)
@@ -213,3 +187,7 @@ usuariosD = [usuario1, usuario2, usuario3, usuario4, usuario5, usuario6, usuario
 relacionesD = [relacion1_2, relacion2_3, relacion3_4, relacion4_5, relacion6_7]
 redD = (usuariosD, relacionesD, [])
 
+usuariosE = [usuario1, usuario5]
+relacionesE = [relacion1_5]
+publicacionesE = [(usuario5, "sed elit ultrices blandit", [usuario5])]
+redE = (usuariosE, relacionesE, publicacionesE)
