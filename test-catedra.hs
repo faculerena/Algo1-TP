@@ -67,6 +67,10 @@ testsPersonales = test [
     " (lesGustanLasMismasPublicaciones) - ambos usuarios en la red les gustan las mismas" ~: (lesGustanLasMismasPublicaciones redB usuario1 usuario3) ~?= True,
 
     " (lesGustanLasMismasPublicaciones) - ambos usuarios en la red no les gustan las mismas" ~: (lesGustanLasMismasPublicaciones redB usuario1 usuario2) ~?= False,
+    
+    " (lesGustanLasMismasPublicaciones) - al primero le gustan las mismas y más publicaciones que al segundo" ~: (lesGustanLasMismasPublicaciones redB usuario5 usuario2) ~?= False,
+    
+    " (lesGustanLasMismasPublicaciones) - al segundo le gustan las mismas y más publicaciones que al primero" ~: (lesGustanLasMismasPublicaciones redB usuario2 usuario5) ~?= False,
 
     " (tieneUnSeguidorFiel) - si no es un seguidor fiel" ~: (tieneUnSeguidorFiel redB usuario5) ~?= False,
 
@@ -78,17 +82,13 @@ testsPersonales = test [
 
     " (existeSecuenciaDeAmigos) - son amigos directos" ~: (existeSecuenciaDeAmigos redD usuario7 usuario6) ~?= True,
 
-    " (existeSecuenciaDeAmigos) - existe una secuencia >= 1" ~: (existeSecuenciaDeAmigos redD usuario1 usuario5) ~?= True 
+    " (existeSecuenciaDeAmigos) - existe una secuencia con una persona en el medio" ~: (existeSecuenciaDeAmigos redD usuario1 usuario3) ~?= True,
+
+    " (existeSecuenciaDeAmigos) - existe una secuencia con mas de una persona en el medio" ~: (existeSecuenciaDeAmigos redD usuario1 usuario5) ~?= True 
 
  ]
 
-
-
-
-
-
 -- Ejemplos
-
 
 usuario1 = (1, "Juan")
 usuario2 = (2, "Natalia")
@@ -187,7 +187,7 @@ usuariosD = [usuario1, usuario2, usuario3, usuario4, usuario5, usuario6, usuario
 relacionesD = [relacion1_2, relacion2_3, relacion3_4, relacion4_5, relacion6_7]
 redD = (usuariosD, relacionesD, [])
 
-usuariosE = [usuario1, usuario5]
+usuariosE = [usuario1, usuario2, usuario3, usuario5]
 relacionesE = [relacion1_5]
-publicacionesE = [(usuario5, "sed elit ultrices blandit", [usuario5])]
+publicacionesE = [(usuario5, "sed elit ultrices blandit", [usuario5]),(usuario4, "sed elit ultrices blandit", [usuario5, usuario3]), (usuario2, "sed elit ultrices blandit", [usuario5,usuario3])]
 redE = (usuariosE, relacionesE, publicacionesE)

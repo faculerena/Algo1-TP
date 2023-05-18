@@ -39,9 +39,11 @@ likesDePublicacion (_, _, us) = us
 -- Ejercicios
 
 -- 1) Dada una red social devolver los nombres de los usuarios que pertenecen a la red.
+-- (Recorre  la lista de usuarios y proyecta el nombre de cada uno a la respuesta)
 nombresDeUsuarios :: RedSocial -> [String]
 nombresDeUsuarios rs = proyectarNombres (usuarios rs) 
 
+-- recorre la lista de usuarios y la convierte solamente en una lista de nombres, conctatenando el nombre de cada usuario a la lista respuesta
 proyectarNombres :: [Usuario] -> [String]
 proyectarNombres [] = []
 proyectarNombres (u:us) = nombreDeUsuario u : proyectarNombres us
@@ -51,6 +53,7 @@ proyectarNombres (u:us) = nombreDeUsuario u : proyectarNombres us
 amigosDe :: RedSocial -> Usuario -> [Usuario]
 amigosDe rs user = relacionesAAmigosDe (relaciones rs) user
 
+-- Recorre sobre las relaciones y si alguno de los 2 usuarios es el que nos importa, ponemos el otro en la lista respuesta
 relacionesAAmigosDe :: [Relacion] -> Usuario -> [Usuario]
 relacionesAAmigosDe [] _ = []
 relacionesAAmigosDe (r:rs) user | (fst r) == user = (snd r) : relacionesAAmigosDe rs user
@@ -59,15 +62,18 @@ relacionesAAmigosDe (r:rs) user | (fst r) == user = (snd r) : relacionesAAmigosD
 
 
 -- 3) Dada una red social y un usuario, devuelve la cantidad de amigos del usuario
+--(llama a amigosDe y aplicamos length para saber cuantos amigos tiene alguien)
 cantidadDeAmigos :: RedSocial -> Usuario -> Int
 cantidadDeAmigos rs user = length (amigosDe rs user)
 
 
 -- 4) Dada una red social, devuelve el usuario con más amigos
+-- (Recorre los usuarios, calculamos la cantidad de amigos y devolvemos el que tenga más amigos)
 usuarioConMasAmigos :: RedSocial -> Usuario
 usuarioConMasAmigos ([],_,_) = undefined
 usuarioConMasAmigos rs = encontrarUsuarioConMasAmigos rs (usuarios rs)
 
+-- recorre todos los usuarios y si encuentra uno que tiene mas amigos, empieza a comprarar el resto contra ese recursivamente
 encontrarUsuarioConMasAmigos :: RedSocial -> [Usuario] -> Usuario
 encontrarUsuarioConMasAmigos rs (x:[]) = x 
 encontrarUsuarioConMasAmigos rs (x:xs) | (cantidadDeAmigos rs x) > (cantidadDeAmigos rs (encontrarUsuarioConMasAmigos rs xs)) = x
@@ -76,6 +82,7 @@ encontrarUsuarioConMasAmigos rs (x:xs) | (cantidadDeAmigos rs x) > (cantidadDeAm
 
 
 -- 5) Dada una red social, devuelve true si esta roberto carlos (o sea, hay alguien con mas de "un millon" de amigos)
+-- (llama a usuarioConMasAmigos, y si ese usuario tiene mas de "un millon" de amigos, sabemos que roberto carlos esta en la red)
 estaRobertoCarlos :: RedSocial -> Bool
 estaRobertoCarlos rs = cantidadDeAmigos rs (usuarioConMasAmigos rs) >= 10
 
@@ -85,6 +92,7 @@ estaRobertoCarlos rs = cantidadDeAmigos rs (usuarioConMasAmigos rs) >= 10
 publicacionesDe :: RedSocial -> Usuario -> [Publicacion]
 publicacionesDe rs user = filtrarPublicaciones (publicaciones rs) user
 
+-- recorre todas las publicaciones y agrega a la lista respuesta las que fueron publicadas por el usuario
 filtrarPublicaciones :: [Publicacion] -> Usuario -> [Publicacion]
 filtrarPublicaciones [] _ = []
 filtrarPublicaciones (p:ps) user | usuarioDePublicacion p == user = p : filtrarPublicaciones ps user
@@ -96,56 +104,75 @@ filtrarPublicaciones (p:ps) user | usuarioDePublicacion p == user = p : filtrarP
 publicacionesQueLeGustanA :: RedSocial -> Usuario -> [Publicacion]
 publicacionesQueLeGustanA rs user = filtrarPublicacionesQueLeGustanA (publicaciones rs) user
 
+-- (recorre todas las publicaciones, de cada publicacion recorre los usuarios que le dieron like y si el usuario que nos importa esta en esa lista, lo agrega a la lista respuesta)
 filtrarPublicacionesQueLeGustanA :: [Publicacion] -> Usuario -> [Publicacion]
 filtrarPublicacionesQueLeGustanA [] _ = []
 filtrarPublicacionesQueLeGustanA (p:ps) user | leGustaA user p = p : filtrarPublicacionesQueLeGustanA ps user
                                              | otherwise = filtrarPublicacionesQueLeGustanA ps user
 
+-- devuelve true si el usuario esta en la lista de likes de la publicacion
 leGustaA :: Usuario -> Publicacion -> Bool
 leGustaA user p = elem user (likesDePublicacion p)
 
 
 
 -- 8) Dada una red social y dos usuarios, indica si les gustan exactamente las mismas publicaciones 
+-- (llama a publicacionesQueLeGustanA y compara las listas de publicaciones que les gustan a cada usuario, si son la misma, gustan las mismas publicaciones)
 lesGustanLasMismasPublicaciones :: RedSocial -> Usuario -> Usuario -> Bool
 lesGustanLasMismasPublicaciones rs user1 user2 = (publicacionesQueLeGustanA rs user1) == (publicacionesQueLeGustanA rs user2) 
 
--- 9)
+-- 9) Dada una red social y un usuario, se fija si existe algun usuario que le dio like a todas las publicaciones de ese usuario.
+-- (si la interseccion entre todas las listas de likes de las publicaciones del usuario no es nula, entonces hay un seguidor fiel)
 tieneUnSeguidorFiel :: RedSocial -> Usuario -> Bool
 tieneUnSeguidorFiel rs user = tieneUnSeguidorFielAux2 user (head (listaDeLikesDePub rs user)) (listaDeLikesDePub rs user)
 
+--Recursion sobre la primer lista de listaDeLikesDePub (posibles seguidores fieles). 
+--si el primer usuario que dio like a la primera publicacion no dio like a las demas, se fija si lo hizo el resto.
 tieneUnSeguidorFielAux2 :: Usuario -> [Usuario] -> [[Usuario]] -> Bool
 tieneUnSeguidorFielAux2 _ _ [] = False
 tieneUnSeguidorFielAux2 _ [] _ = False
 tieneUnSeguidorFielAux2 user (x:xs) listaDeLikesDePub | tieneUnSeguidorFielAux1 user (x:xs) listaDeLikesDePub == False = tieneUnSeguidorFielAux2 user (xs) listaDeLikesDePub 
                                                       | otherwise = True
 
+--Recursion sobre el listaDeLikesDePub (lista de listas de usuarios que dieron like) se fija si el primer usuario que dio like a la primera publicacion tambien le dio like a las demas.
 tieneUnSeguidorFielAux1 :: Usuario -> [Usuario] -> [[Usuario]] -> Bool
 tieneUnSeguidorFielAux1 _ _ [] = True
 tieneUnSeguidorFielAux1 user (x:xs) (y:ys) | elem x y && x /= user = tieneUnSeguidorFielAux1 user (x:xs) ys
                                            | otherwise = False
 
 
+--devuelve una lista con las listas de los usuarios que le dieron like a cada publicacion de un usuario
+--si el user no tiene publicaciones , listaDeLikesDePub rs user pasa la lista vacia
 listaDeLikesDePub :: RedSocial -> Usuario -> [[Usuario]]
 listaDeLikesDePub rs user = filtrarLikesDePublicacionesDe (publicacionesDe rs user)
 
+-- devuelve una lista de listas de usuarios que le dieron like a cada publicacion de una lista de publicaciones.
 filtrarLikesDePublicacionesDe :: [Publicacion] -> [[Usuario]]
 filtrarLikesDePublicacionesDe [] = []
 filtrarLikesDePublicacionesDe (x:xs) = (likesDePublicacion x ): (filtrarLikesDePublicacionesDe xs)
 
 
 
--- 10) Dada una red social y 2 usuarios, devuelve true sii existe una manera de unir a esas dos personas con amigos entre medio (A amigo de B, B amigo de C, entonces A y C estan unidos por amigos)
+-- 10) Dada una red social y 2 usuarios, revisa si existe una manera de unir a esas dos personas con amigos entre medio (A amigo de B, B amigo de C, entonces A y C estan unidos por amigos)
+-- (recorre cada usuario y sus amigos, los que ya fueron visitados se guardan en una lista, si se encuentra el usuario2, entonces existe una secuencia de amigos, si no queda nadie por visitar que no este en vistos, devuelve false)
 existeSecuenciaDeAmigos :: RedSocial -> Usuario -> Usuario -> Bool
 existeSecuenciaDeAmigos (_, rel, _) user1 user2 = secAmigosAux rel user1 user2 []
 
+-- esta funcion sirve para pasarle de manera ordenada los parametros a la funcion auxiliar2, que es la que hace el trabajo
+-- esta funcion solamente pasa los amigos del usuario1 a la funcion auxiliar2 y una lista vacia de visitados 
 secAmigosAux :: [Relacion] -> Usuario -> Usuario -> [Usuario] -> Bool
 secAmigosAux rel user1 user2 vistos | user1 == user2 = True
                                     | otherwise = secAmigosAux2 rel user1 user2 vistos amigos
                                      where amigos = amigosDe ([],rel,[]) user1
 
+-- recorre todo los amigos de un usuario
+-- si el usuario no fue visitado, lo visitamos y lo agregamos a vistos
+-- si en algun momento encontramos al usuario, satisface la condicion
+-- si encontramos un usuario que ya visitamos, lo ignoramos
+-- y si nos quedamo sin amigos por visitar, no existe una secuencia de amigos 
 secAmigosAux2 :: [Relacion] -> Usuario -> Usuario -> [Usuario] -> [Usuario] -> Bool
 secAmigosAux2 _ _ _ _ [] = False
 secAmigosAux2 rel user1 user2 vistos (amigo:resto) | amigo `elem` vistos = secAmigosAux2 rel user1 user2 vistos resto
                                                    | amigo == user2 = True
                                                    | otherwise = secAmigosAux2 rel amigo user2 (user1:vistos) (amigosDe ([],rel,[]) amigo ++ resto)
+
